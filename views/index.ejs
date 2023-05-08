@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blog App</title>
+</head>
+<body>
+  <h1>Blog App</h1>
+  <form>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title"><br>
+    <label for="content">Content:</label>
+    <textarea id="content" name="content"></textarea><br>
+
+    <button type="button" id="add">Add Blog</button>
+    <button type="button" id="update">Update Blog</button>
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Date</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody id="blogTable">
+      <% blogs.forEach(function(blog) { %>
+        <tr data-id="<%= blog._id %>">
+          <td><%= blog.title %></td>
+          <td><%= blog.content %></td>
+          <td><%= blog.date %></td>
+          <td><button class="edit">Edit</button></td>
+          <td><button class="delete">Delete</button></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(() => {
+      // Add blog
+      $('#add').click(() => {
+        const title = $('#title').val();
+        const content = $('#content').val();
+
+        $.post('/blogs', { title, content }, (newBlog) => {
+          $('#blogTable').append(`
+            <tr data-id="${newBlog._id}">
+              <td>${newBlog.title}</td>
+              <td>${newBlog.content}</td>
+              <td>${newBlog.date.format('YY/MM/DD')}</td>
+              <td><button class="edit">Edit</button></td>
+              <td><button class="delete">Delete</button></td>
+            </tr>
+          `);
+        });
+      });
+
+      // Update blog
+      $('#update').click(() => {
+        const id = $('tr.selected').data('id');
+        const title = $('#title').val();
+        const content = $('#content').val();
+
+        $.ajax({
+          url: `/blogs/${id}`,
+          method: 'PUT',
+          data: { title, content },
+          success: (updatedBlog) => {
+            $('tr.selected td:nth-child(1)').text(updatedBlog.title);
+            $('tr.selected td:nth-child(2)').text(updatedBlog.content);
+          },
+        });
+      });
+
+      // Select a blog to update or delete
+      $('#blogTable').on('click', 'tr', function () {
+        $('#blogTable tr').removeClass('selected');
+        $(this).addClass('selected');
+        const title = $(this).find('td:nth-child(1)').text();
+        const content = $(this).find('td:nth-child(2)').text();
+        $('#title').val(title);
+        $('#content').val(content);
+      });
+
+      // Delete blog
+      $('#blogTable').on('click', '.delete', function (event) {
+        event.stopPropagation();
+        const id = $(this).closest('tr').data('id');
+
+        $.ajax({
+          url: `/blogs/${id}`,
+          method: 'DELETE',
+          success: () => {
+            $(this).closest('tr').remove();
+          },
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+ 

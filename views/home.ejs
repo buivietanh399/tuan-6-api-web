@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <title>Home Page</title>
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="/create">Create blogs</a>
+        
+    </div>
+
+    <div class="table-container">
+
+        <div class = "title">List BLogs</div>
+        <table>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Content</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <% blogs.forEach(function(blog) { %>
+        <tr>
+          <td> <%= blog.id %> </td>
+          <td> <%= blog.titlt %> </td>
+          <td> <%= blog.content %> </td>
+          <!-- <td> <%= blog.city %> </td> -->
+          <td>
+            <a href="/update/<%= user.id %>">Edit</a>
+            <form action="/delete-user/<%=user.id%>" method="POST">
+              <button>Delete</button>
+            </form>
+           
+          </td>
+        </tr>
+        <% }); %>
+        </table>
+    </div>
+
+</body>
+</html>
